@@ -98,3 +98,9 @@ application-prod.yml
 **/*.pem
 **/*.p12
 **/*.jks
+
+# Git helper scripts
+git-commits.bat
+
+# Migration placeholder files
+.gitkeep
