@@ -31,7 +31,8 @@ public class PatientServiceImpl implements PatientService {
         // Actually UserService usually creates User. Patient entity is separate.
         // Let's rely on finding by User ID.
         
-        Patient patient = patientRepository.findByUserId(user.getId())
+        Patient patient = patientRepository.findByUserId(user.getId()).stream()
+                .findFirst()
                  .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found. Please book an appointment to initialize your profile."));
 
         return mapToResponse(patient);
@@ -42,7 +43,8 @@ public class PatientServiceImpl implements PatientService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Patient patient = patientRepository.findByUserId(user.getId())
+        Patient patient = patientRepository.findByUserId(user.getId()).stream()
+                .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
         // Update User details (common fields)
