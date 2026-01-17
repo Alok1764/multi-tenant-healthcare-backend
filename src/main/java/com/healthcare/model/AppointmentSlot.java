@@ -29,6 +29,9 @@ import java.util.List;
 @Builder
 public class AppointmentSlot extends BaseEntity {
 
+    @Version
+    private Long version;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
