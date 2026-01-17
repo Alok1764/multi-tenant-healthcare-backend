@@ -6,4 +6,5 @@ import com.healthcare.dto.response.DoctorResponse;
 public interface DoctorService {
     DoctorResponse onboardDoctor(DoctorRegistrationRequest request);
     DoctorResponse getDoctorProfile(Long doctorId);
+    void setAvailability(AvailabilityRequest request);
 }

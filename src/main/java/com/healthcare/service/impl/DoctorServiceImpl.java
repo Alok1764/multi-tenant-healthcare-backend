@@ -69,4 +69,31 @@ public class DoctorServiceImpl implements DoctorService {
                 .isVerified(doctor.getIsVerified())
                 .build();
     }
+
+    @Override
+    public void setAvailability(com.healthcare.dto.request.AvailabilityRequest request) {
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + request.getDoctorId()));
+
+        java.time.LocalDateTime currentSlotStart = request.getStartTime();
+        java.time.LocalDateTime endTime = request.getEndTime();
+        int duration = request.getSlotDurationMinutes();
+
+        while (currentSlotStart.plusMinutes(duration).isBefore(endTime) || currentSlotStart.plusMinutes(duration).isEqual(endTime)) {
+            com.healthcare.model.AppointmentSlot slot = com.healthcare.model.AppointmentSlot.builder()
+                    .hospital(doctor.getHospital())
+                    .doctor(doctor)
+                    .slotDate(currentSlotStart.toLocalDate())
+                    .startTime(currentSlotStart.toLocalTime())
+                    .endTime(currentSlotStart.toLocalTime().plusMinutes(duration))
+                    .isAvailable(true)
+                    .maxAppointments(1)
+                    .bookedAppointments(0)
+                    .build();
+
+            doctor.addAppointmentSlot(slot);
+            currentSlotStart = currentSlotStart.plusMinutes(duration);
+        }
+        doctorRepository.save(doctor);
+    }
 }
