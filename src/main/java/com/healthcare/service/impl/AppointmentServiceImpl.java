@@ -52,12 +52,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // Create appointment
         Appointment appointment = Appointment.builder()
+                .hospital(slot.getHospital())
                 .doctor(slot.getDoctor())
                 .patient(patient)
                 .appointmentSlot(slot)
                 .appointmentDate(slot.getSlotDate())
-                .startTime(slot.getStartTime())
-                .endTime(slot.getEndTime())
+                .appointmentTime(slot.getStartTime())
                 .status(AppointmentStatus.BOOKED)
                 .reason(request.getReason())
                 .build();
@@ -119,8 +119,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .doctorName(appointment.getDoctor().getUser().getFullName())
                 .slotId(appointment.getAppointmentSlot().getId())
                 .appointmentDate(appointment.getAppointmentDate())
-                .startTime(appointment.getStartTime())
-                .endTime(appointment.getEndTime())
+                .startTime(appointment.getAppointmentTime())
+                .endTime(appointment.getAppointmentSlot().getEndTime())
                 .status(appointment.getStatus())
                 .reason(appointment.getReason())
                 .createdAt(appointment.getCreatedAt())
