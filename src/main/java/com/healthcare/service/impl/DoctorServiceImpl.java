@@ -21,6 +21,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final UserRepository userRepository;
+    private final com.healthcare.repository.SpecializationRepository specializationRepository;
 
     @Override
     public DoctorResponse onboardDoctor(DoctorRegistrationRequest request) {
@@ -40,7 +41,8 @@ public class DoctorServiceImpl implements DoctorService {
         Doctor doctor = Doctor.builder()
                 .user(user)
                 .licenseNumber(request.getLicenseNumber())
-                .specialization(request.getSpecialization())
+                .specialization(specializationRepository.findByName(request.getSpecialization())
+                        .orElseThrow(() -> new ResourceNotFoundException("Specialization not found: " + request.getSpecialization())))
                 .consultationFee(request.getConsultationFee())
                 .bio(request.getBio())
                 .isVerified(false) // Verified by admin later
@@ -63,7 +65,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .userId(doctor.getUser().getId())
                 .fullName(doctor.getUser().getFullName())
                 .licenseNumber(doctor.getLicenseNumber())
-                .specialization(doctor.getSpecialization())
+                .specialization(doctor.getSpecialization().getName())
                 .consultationFee(doctor.getConsultationFee())
                 .bio(doctor.getBio())
                 .isVerified(doctor.getIsVerified())
