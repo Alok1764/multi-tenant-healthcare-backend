@@ -22,6 +22,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorRepository doctorRepository;
     private final UserRepository userRepository;
     private final com.healthcare.repository.SpecializationRepository specializationRepository;
+    private final com.healthcare.repository.HospitalRepository hospitalRepository;
 
     @Override
     public DoctorResponse onboardDoctor(DoctorRegistrationRequest request) {
@@ -40,9 +41,13 @@ public class DoctorServiceImpl implements DoctorService {
 
         Doctor doctor = Doctor.builder()
                 .user(user)
+                .hospital(hospitalRepository.findById(request.getHospitalId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Hospital not found with ID: " + request.getHospitalId())))
                 .licenseNumber(request.getLicenseNumber())
                 .specialization(specializationRepository.findByName(request.getSpecialization())
                         .orElseThrow(() -> new ResourceNotFoundException("Specialization not found: " + request.getSpecialization())))
+                .qualification(request.getQualification())
+                .experienceYears(request.getExperienceYears())
                 .consultationFee(request.getConsultationFee())
                 .bio(request.getBio())
                 .isVerified(false) // Verified by admin later
