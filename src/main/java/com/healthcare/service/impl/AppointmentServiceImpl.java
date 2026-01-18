@@ -59,7 +59,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .appointmentDate(slot.getSlotDate())
                 .appointmentTime(slot.getStartTime())
                 .status(AppointmentStatus.BOOKED)
-                .reason(request.getReason())
+                .patientNotes(request.getReason())
                 .build();
 
         // Update slot availability (Managed Entity)
@@ -122,7 +122,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .startTime(appointment.getAppointmentTime())
                 .endTime(appointment.getAppointmentSlot().getEndTime())
                 .status(appointment.getStatus())
-                .reason(appointment.getReason())
+                .reason(appointment.getPatientNotes())
                 .createdAt(appointment.getCreatedAt())
                 .build();
     }
