@@ -48,6 +48,7 @@ public class Hospital extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String state;
 
+    @Builder.Default
     @Column(nullable = false, length = 100)
     private String country = "India";
 
@@ -61,11 +62,12 @@ public class Hospital extends BaseEntity {
     @JoinColumn(name = "admin_user_id", unique = true)
     private User adminUser;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
     @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    private Boolean isVerified;
 
     // Bidirectional relationships
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)

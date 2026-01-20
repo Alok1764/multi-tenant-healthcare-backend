@@ -1,11 +1,15 @@
 package com.healthcare.controller;
 
 import com.healthcare.dto.request.LoginRequest;
+import com.healthcare.dto.request.RefreshTokenRequest;
 import com.healthcare.dto.request.UserRegistrationRequest;
 import com.healthcare.dto.response.AuthenticationResponse;
+import com.healthcare.dto.response.RefreshTokenResponse;
 import com.healthcare.dto.response.UserResponse;
+import com.healthcare.model.RefreshToken;
 import com.healthcare.security.CustomUserDetailsService;
 import com.healthcare.security.JwtService;
+import com.healthcare.service.RefreshTokenService;
 import com.healthcare.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,50 +28,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody @Valid UserRegistrationRequest request
     ) {
-        UserResponse savedUser = userService.registerUser(request);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getEmail());
-        
-        String jwtToken = jwtService.generateToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
-
-        return ResponseEntity.ok(AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .user(savedUser)
-                .build());
+        return ResponseEntity.ok(userService.registerUser(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
-            @RequestBody @Valid LoginRequest request
+            @RequestBody @Valid LoginRequest loginRequest
     ) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+      return ResponseEntity.ok(userService.loginUser(loginRequest));
+    }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-        String jwtToken = jwtService.generateToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
-        
-        // Fetch full user details to return in response
-        UserResponse userResponse = userService.findByEmail(request.getEmail())
-                .orElseThrow(); // Should exist if authentication passed
 
-        return ResponseEntity.ok(AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .user(userResponse)
-                .build());
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(
+            @RequestBody @Valid RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(refreshTokenService.refreshToken(request));
     }
 }

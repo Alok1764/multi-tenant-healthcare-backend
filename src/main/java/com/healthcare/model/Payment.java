@@ -4,6 +4,7 @@ import com.healthcare.model.enums.PaymentMethod;
 import com.healthcare.model.enums.PaymentType;
 import com.healthcare.model.enums.TransactionStatus;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -69,8 +70,8 @@ public class Payment extends BaseEntity {
     @Column(name = "payment_gateway", length = 100)
     private String paymentGateway;
 
-    @Type(JsonBinaryType.class)
-    @Column(name = "payment_gateway_response", columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    @Column(name = "payment_gateway_response", columnDefinition = "json")
     private Map<String, Object> paymentGatewayResponse;
 
     @Column(name = "paid_at")

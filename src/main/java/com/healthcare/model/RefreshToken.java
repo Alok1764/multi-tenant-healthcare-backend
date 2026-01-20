@@ -33,5 +33,5 @@ public class RefreshToken extends BaseEntity {
     private LocalDateTime expiresAt;
 
     @Column(name = "is_revoked", nullable = false)
-    private Boolean isRevoked = false;
+    private Boolean isRevoked;
 }

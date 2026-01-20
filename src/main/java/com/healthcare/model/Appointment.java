@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -76,7 +78,7 @@ public class Appointment extends BaseEntity {
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private java.util.List<Payment> payments = new java.util.ArrayList<>();
+    private List<Payment> payments = new ArrayList<>();
 
     // Helper methods
     public void setMedicalRecord(MedicalRecord record) {

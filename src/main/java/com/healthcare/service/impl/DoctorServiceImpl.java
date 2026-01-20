@@ -4,6 +4,7 @@ import com.healthcare.dto.request.DoctorRegistrationRequest;
 import com.healthcare.dto.response.DoctorResponse;
 import com.healthcare.exception.ResourceConflictException;
 import com.healthcare.exception.ResourceNotFoundException;
+import com.healthcare.dto.request.AvailabilityRequest;
 import com.healthcare.model.Doctor;
 import com.healthcare.model.User;
 import com.healthcare.model.enums.UserRole;
@@ -78,7 +79,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public void setAvailability(com.healthcare.dto.request.AvailabilityRequest request) {
+    public void setAvailability(AvailabilityRequest request) {
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + request.getDoctorId()));
 

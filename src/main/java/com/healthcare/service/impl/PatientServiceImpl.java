@@ -5,6 +5,8 @@ import com.healthcare.dto.response.PatientProfileResponse;
 import com.healthcare.exception.ResourceNotFoundException;
 import com.healthcare.model.Patient;
 import com.healthcare.model.User;
+import com.healthcare.model.enums.BloodGroup;
+import com.healthcare.model.enums.Gender;
 import com.healthcare.repository.PatientRepository;
 import com.healthcare.repository.UserRepository;
 import com.healthcare.service.PatientService;
@@ -54,8 +56,8 @@ public class PatientServiceImpl implements PatientService {
         // Update Patient specific details
         patient.setAddress(request.getAddress());
         patient.setDateOfBirth(request.getDateOfBirth());
-        patient.setGender(request.getGender());
-        patient.setBloodGroup(request.getBloodGroup());
+        patient.setGender(Gender.valueOf(request.getGender()));
+        patient.setBloodGroup(BloodGroup.valueOf(request.getBloodGroup()));
         
         Patient savedPatient = patientRepository.save(patient);
         return mapToResponse(savedPatient);
@@ -77,9 +79,9 @@ public class PatientServiceImpl implements PatientService {
                 .phoneNumber(patient.getUser().getPhoneNumber())
                 .address(patient.getAddress())
                 .dateOfBirth(patient.getDateOfBirth())
-                .gender(patient.getGender())
-                .bloodGroup(patient.getBloodGroup())
-                .active(patient.getUser().isActive())
+                .gender(String.valueOf(patient.getGender()))
+                .bloodGroup(String.valueOf(patient.getBloodGroup()))
+                .active(patient.getUser().getIsActive())
                 .build();
     }
 }

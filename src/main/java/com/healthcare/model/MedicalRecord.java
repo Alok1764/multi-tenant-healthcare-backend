@@ -1,6 +1,7 @@
 package com.healthcare.model;
 
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -68,12 +69,12 @@ public class MedicalRecord extends BaseEntity {
     @Column(name = "follow_up_date")
     private LocalDate followUpDate;
 
-    @Type(JsonBinaryType.class)
-    @Column(name = "vital_signs", columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    @Column(name = "vital_signs", columnDefinition = "json")
     private Map<String, Object> vitalSigns;
 
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
     private Map<String, Object> attachments;
 
     @Column(columnDefinition = "TEXT")

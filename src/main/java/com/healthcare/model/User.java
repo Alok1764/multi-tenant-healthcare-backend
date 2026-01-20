@@ -36,7 +36,7 @@ public class User extends BaseEntity {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "phone_number", length = 20)
+    @Column(name = "phone_number", length = 10)
     private String phoneNumber;
 
     @NotNull
@@ -44,11 +44,12 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 50)
     private UserRole role;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
     @Column(name = "is_email_verified", nullable = false)
-    private Boolean isEmailVerified = false;
+    private Boolean isEmailVerified;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;

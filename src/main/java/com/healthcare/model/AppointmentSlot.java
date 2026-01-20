@@ -58,11 +58,13 @@ public class AppointmentSlot extends BaseEntity {
     private Boolean isAvailable = true;
 
     @NotNull
+    @Builder.Default
     @Positive
     @Column(name = "max_appointments", nullable = false)
     private Integer maxAppointments = 1;
 
     @NotNull
+    @Builder.Default
     @PositiveOrZero
     @Column(name = "booked_appointments", nullable = false)
     private Integer bookedAppointments = 0;

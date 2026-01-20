@@ -53,8 +53,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .appointment(appointment)
                 .patient(appointment.getPatient())
                 .amount(CONSULTATION_FEE)
-                .paymentType(PaymentType.CONSULTATION_FEE)
-                .paymentMethod(PaymentMethod.CREDIT_CARD) // Default or parse from request
+                .paymentType(PaymentType.CONSULTATION)
+                .paymentMethod(PaymentMethod.CARD) // Default or parse from request
                 .paymentStatus(TransactionStatus.COMPLETED) // Mock Success
                 .transactionId(transactionId)
                 .paidAt(LocalDateTime.now())

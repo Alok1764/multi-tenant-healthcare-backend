@@ -2,6 +2,7 @@ package com.healthcare.model;
 
 import com.healthcare.model.enums.SubscriptionPlanName;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -44,10 +45,11 @@ public class SubscriptionPlan extends BaseEntity {
     @Column(name = "max_patients")
     private Integer maxPatients;
 
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
     private Map<String, Object> features;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
