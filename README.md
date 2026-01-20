@@ -8,7 +8,7 @@ A Spring Boot 4.0.0 application with PostgreSQL, JWT authentication, and compreh
 - **Spring Web** - RESTful API
 - **Spring Security** - Authentication & Authorization
 - **Spring Data JPA** - Database ORM
-- **PostgreSQL** - Database
+- **MySQL** - Database
 - **Lombok** - Boilerplate code reduction
 - **Bean Validation** - Input validation
 - **JWT (JJWT 0.12.3)** - Token-based authentication
