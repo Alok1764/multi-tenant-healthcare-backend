@@ -1,10 +1,10 @@
 # Healthcare Application
 
-A Spring Boot 3.2.1 application with PostgreSQL, JWT authentication, and comprehensive API documentation.
+A Spring Boot 4.0.0 application with PostgreSQL, JWT authentication, and comprehensive API documentation.
 
 ## Technologies Used
 
-- **Spring Boot 3.2.1** (Java 17)
+- **Spring Boot 4.0.0** (Java 17)
 - **Spring Web** - RESTful API
 - **Spring Security** - Authentication & Authorization
 - **Spring Data JPA** - Database ORM
@@ -12,28 +12,19 @@ A Spring Boot 3.2.1 application with PostgreSQL, JWT authentication, and compreh
 - **Lombok** - Boilerplate code reduction
 - **Bean Validation** - Input validation
 - **JWT (JJWT 0.12.3)** - Token-based authentication
-- **SpringDoc OpenAPI** - API documentation
 
 ## Prerequisites
 
 - Java 17 or higher
 - Maven 3.6+
-- PostgreSQL 12+
+- MySQL
 
 ## Database Setup
 
-1. Install PostgreSQL
+1. Install MySQL
 2. Create a database:
 ```sql
-CREATE DATABASE healthcare_db;
-```
-
-3. Update credentials in `src/main/resources/application.yml` if needed:
-```yaml
-spring:
-  datasource:
-    username: postgres
-    password: postgres
+CREATE DATABASE healthcare_system;
 ```
 
 ## Running the Application
@@ -65,8 +56,8 @@ src/main/java/com/healthcare/
 └── exception/       # Custom exceptions
 
 src/main/resources/
-├── application.yml  # Application configuration
-└── db/migration/    # Flyway migration scripts
+├── application.properties  # Application configuration
+
 ```
 
 ## Database Schema
@@ -81,31 +72,12 @@ The application includes a comprehensive database schema with 15 tables supporti
 - **V5**: Medical records (medical_records)
 - **V6**: Payments (payments, platform_earnings)
 
-### Running Migrations
-
-**Option 1: Quick Setup (All at once)**
-```bash
-cd src/main/resources/db/migration
-psql -U postgres -d healthcare_db -f setup_all.sql
-```
-
-**Option 2: Manual (One by one)**
-```bash
-psql -U postgres -d healthcare_db -f V1__users_and_authentication.sql
-psql -U postgres -d healthcare_db -f V2__hospitals_and_subscriptions.sql
-psql -U postgres -d healthcare_db -f V3__doctors_and_patients.sql
-psql -U postgres -d healthcare_db -f V4__appointments_and_slots.sql
-psql -U postgres -d healthcare_db -f V5__medical_records.sql
-psql -U postgres -d healthcare_db -f V6__payments_and_earnings.sql
-```
-
-For detailed schema documentation, see the [Database Schema Documentation](src/main/resources/db/migration/README_SCHEMA.md).
 
 ## Configuration
 
-Key configurations in `application.yml`:
+Key configurations in `application.properties`:
 - **Server Port**: 8080
-- **Database**: PostgreSQL on localhost:5432
+- **Database**: MySQL on localhost:3306
 - **JPA**: `ddl-auto: update` (auto-create tables from entities)
 - **JWT Secret**: Configured for token generation
 - **JWT Expiration**: 24 hours (access token), 7 days (refresh token)
