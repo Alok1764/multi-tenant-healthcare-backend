@@ -5,6 +5,7 @@ import com.healthcare.dto.response.AppointmentResponse;
 import com.healthcare.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +20,16 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/book")
-    @PreAuthorize("hasAuthority('PATIENT')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> bookAppointment(
+            @RequestHeader("X-Idempotency-Key")String idempotencyKey,
             @RequestBody @Valid AppointmentRequest request
     ) {
-        return ResponseEntity.ok(appointmentService.bookAppointment(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.bookAppointment(request,idempotencyKey));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.getAppointment(id));
     }
@@ -48,6 +50,6 @@ public class AppointmentController {
     @PreAuthorize("hasAuthority('PATIENT') or hasAuthority('DOCTOR')")
     public ResponseEntity<Void> cancelAppointment(@PathVariable Long id) {
         appointmentService.cancelAppointment(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

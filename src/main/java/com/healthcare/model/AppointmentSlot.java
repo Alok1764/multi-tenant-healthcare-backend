@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "appointment_slots",
        uniqueConstraints = {
@@ -85,11 +86,11 @@ public class AppointmentSlot extends BaseEntity {
     }
 
     public void removeAppointment(Appointment appointment) {
+        if(bookedAppointments <=0) return;
+
         appointments.remove(appointment);
         appointment.setAppointmentSlot(null);
         this.bookedAppointments--;
-        if (this.bookedAppointments < this.maxAppointments) {
-            this.isAvailable = true;
-        }
+        this.isAvailable = this.bookedAppointments < this.maxAppointments;
     }
 }

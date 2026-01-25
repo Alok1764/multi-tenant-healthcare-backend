@@ -23,7 +23,7 @@ public class HospitalController {
     private final HospitalService hospitalService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_HOSPITAL_ADMIN')")
     @Operation(summary = "Create Hospital", description = "Register a new hospital (Admin only)")
     public ResponseEntity<HospitalResponse> createHospital(@Valid @RequestBody HospitalRequest request) {
         return new ResponseEntity<>(hospitalService.createHospital(request), HttpStatus.CREATED);

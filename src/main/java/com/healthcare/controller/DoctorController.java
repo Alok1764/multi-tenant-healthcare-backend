@@ -18,7 +18,7 @@ public class DoctorController {
     private final DoctorService doctorService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_HOSPITAL_ADMIN')")
     public ResponseEntity<DoctorResponse> onboardDoctor(
             @RequestBody @Valid DoctorRegistrationRequest request
     ) {

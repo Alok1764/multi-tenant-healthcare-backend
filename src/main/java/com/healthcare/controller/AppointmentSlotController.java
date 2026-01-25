@@ -1,0 +1,29 @@
+package com.healthcare.controller;
+
+import com.healthcare.dto.request.AppointmentSlotRequest;
+import com.healthcare.dto.response.AppointmentSlotResponse;
+
+import com.healthcare.service.AppointmentSlotService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/appointment-slots")
+@RequiredArgsConstructor
+public class AppointmentSlotController {
+
+    private final AppointmentSlotService appointmentSlotService;
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_DOCTOR') or hasAuthority('ROLE_HOSPITAL_ADMIN')")
+    public ResponseEntity<AppointmentSlotResponse> createSlot(
+            @RequestBody @Valid AppointmentSlotRequest appointmentSlotRequest
+    ) {
+       return ResponseEntity.status(HttpStatus.CREATED).body(appointmentSlotService.createSlot(appointmentSlotRequest));
+    }
+
+}

@@ -13,6 +13,7 @@ import com.healthcare.service.RefreshTokenService;
 import com.healthcare.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +35,7 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody @Valid UserRegistrationRequest request
     ) {
-        return ResponseEntity.ok(userService.registerUser(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(request));
     }
 
     @PostMapping("/login")

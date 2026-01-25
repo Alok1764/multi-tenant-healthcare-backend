@@ -34,6 +34,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public RefreshToken createRefreshToken(String email) {
@@ -79,14 +80,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
 
-        RefreshToken refreshToken=findByToken(request.getToken())
+        RefreshToken refreshToken=findByToken(request.getRefreshToken())
                 .map(this::verifyExpiration)
                 .orElseThrow(()-> new TokenRefreshException("Invalid refresh Token"));
 
         revokeToken(refreshToken);
 
         String email=refreshToken.getUser().getEmail();
-        String accessToken = jwtService.generateToken(email);
+        String accessToken = jwtService.generateToken(userDetailsService.loadUserByUsername(email));
 
         RefreshToken newRefreshToken=createRefreshToken(email);
 

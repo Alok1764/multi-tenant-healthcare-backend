@@ -16,6 +16,7 @@ public class HospitalRequest {
     @NotBlank(message = "Hospital Name is required")
     private String hospitalName;
 
+    @NotBlank(message="Hospital registration number is required ")
     private String registrationNumber;
 
     @NotBlank(message = "Email is required")
@@ -38,5 +39,6 @@ public class HospitalRequest {
     private String country;
 
     private String postalCode;
+
     private String website;
 }

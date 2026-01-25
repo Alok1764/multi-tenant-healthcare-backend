@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userResponse.getEmail());
 
-        String jwtToken = jwtService.generateToken(userDetails.getUsername());
+        String jwtToken = jwtService.generateToken(userDetails);
         RefreshToken refreshToken=refreshTokenService.createRefreshToken(userResponse.getEmail());
 
         return AuthenticationResponse.builder()
@@ -79,7 +79,8 @@ public class UserServiceImpl implements UserService {
         );
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-        String jwtToken = jwtService.generateToken(userDetails.getUsername());
+        String jwtToken = jwtService.generateToken(userDetails);
+
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginRequest.getEmail());
 
@@ -105,8 +106,6 @@ public class UserServiceImpl implements UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
-
-
 
 
     private UserResponse mapToResponse(User user) {

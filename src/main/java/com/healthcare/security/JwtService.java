@@ -1,5 +1,6 @@
 package com.healthcare.security;
 
+import com.healthcare.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -23,8 +24,6 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
 
-//    @Value("${application.security.jwt.refresh-token.expiration}")
-//    private long refreshExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -35,12 +34,9 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(String username) {
-        return generateToken(new HashMap<>(), username);
-    }
+    public String generateToken(UserDetails userDetails) {
 
-    public String generateToken(Map<String, Object> extraClaims, String username) {
-        return buildToken(extraClaims, username, jwtExpiration);
+        return buildToken(new HashMap<>(),userDetails.getUsername(),jwtExpiration);
     }
 
     private String buildToken(Map<String, Object> extraClaims, String username, long expiration) {
@@ -54,8 +50,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername());
+        return extractUsername(token).equals(userDetails.getUsername());
     }
 
     private Claims extractAllClaims(String token) {

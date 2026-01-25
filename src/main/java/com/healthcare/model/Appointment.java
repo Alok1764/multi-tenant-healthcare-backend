@@ -11,8 +11,13 @@ import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "appointments", indexes = {
+@Table(name = "appointments",
+        uniqueConstraints = {
+        @UniqueConstraint(name = "uk_patient_idempotency",columnNames = {"patient_id,idempotency_key"})
+        },
+        indexes = {
         @Index(name = "idx_appointments_hospital_id", columnList = "hospital_id"),
         @Index(name = "idx_appointments_slot_id", columnList = "appointment_slot_id"),
         @Index(name = "idx_appointments_doctor_id", columnList = "doctor_id"),
@@ -45,6 +50,9 @@ public class Appointment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
+
+    @Column(nullable = false)
+    private String idempotencyKey;
 
     @NotNull
     @Column(name = "appointment_date", nullable = false)

@@ -25,6 +25,7 @@ public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlot
 
     List<AppointmentSlot> findByDoctorIdAndSlotDate(Long doctorId, LocalDate slotDate);
 
+
     // Availability queries
     @Query("SELECT a FROM AppointmentSlot a WHERE a.doctor.id = :doctorId " +
            "AND a.slotDate = :date AND a.isAvailable = true " +
@@ -47,6 +48,7 @@ public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlot
     Optional<AppointmentSlot> findByDoctorAndDateTime(@Param("doctorId") Long doctorId,
                                                        @Param("date") LocalDate date,
                                                        @Param("time") LocalTime time);
+
 
     // Fully booked slots
     @Query("SELECT a FROM AppointmentSlot a WHERE a.hospital.id = :hospitalId " +

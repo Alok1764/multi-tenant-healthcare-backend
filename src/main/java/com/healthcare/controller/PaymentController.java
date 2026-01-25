@@ -27,7 +27,7 @@ public class PaymentController {
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT', 'ROLE_UADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT', 'ROLE_ADMIN')")
     @Operation(summary = "Get Payment Details", description = "Get payment info for a specific appointment")
     public ResponseEntity<PaymentResponse> getPaymentStatus(@PathVariable Long appointmentId) {
         return ResponseEntity.ok(paymentService.getPaymentByAppointmentId(appointmentId));

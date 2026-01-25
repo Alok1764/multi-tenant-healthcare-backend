@@ -2,6 +2,7 @@ package com.healthcare.repository;
 
 import com.healthcare.model.Appointment;
 import com.healthcare.model.enums.AppointmentStatus;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,12 +20,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Optional<Appointment> findByIdAndHospitalId(Long id, Long hospitalId);
 
+
     // Doctor queries
     List<Appointment> findByDoctorId(Long doctorId);
 
     List<Appointment> findByDoctorIdAndAppointmentDate(Long doctorId, LocalDate date);
 
     List<Appointment> findByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
+
 
     // Patient queries
     List<Appointment> findByPatientId(Long patientId);
@@ -35,6 +38,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            "AND a.hospital.id = :hospitalId ORDER BY a.appointmentDate DESC, a.appointmentTime DESC")
     List<Appointment> findByPatientAndHospital(@Param("patientId") Long patientId,
                                                @Param("hospitalId") Long hospitalId);
+
+
+    // Booking queries
+    Optional<Appointment> findByPatientIdAndIdempotencyKey(Long patientId, String idempotencyKey);
+
 
     // Status queries
     List<Appointment> findByStatus(AppointmentStatus status);
@@ -86,4 +94,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT a.status, COUNT(a) FROM Appointment a WHERE a.hospital.id = :hospitalId " +
            "GROUP BY a.status")
     List<Object[]> getAppointmentStatsByHospital(@Param("hospitalId") Long hospitalId);
+
+
 }

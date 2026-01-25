@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,15 +32,21 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientRepository patientRepository;
 
     @Override
-    public AppointmentResponse bookAppointment(AppointmentRequest request) {
+    public AppointmentResponse bookAppointment(AppointmentRequest request,String idempotencyKey) {
         try {
-            return bookAppointmentInternal(request);
+            return bookAppointmentInternal(request,idempotencyKey);
         } catch (ObjectOptimisticLockingFailureException e) {
             throw new ResourceConflictException("This slot was just booked by someone else. Please try another slot.");
         }
     }
 
-    private AppointmentResponse bookAppointmentInternal(AppointmentRequest request) {
+    private AppointmentResponse bookAppointmentInternal(AppointmentRequest request,String idempotencyKey) {
+
+        Optional<Appointment> existingAppointment=appointmentRepository.findByPatientIdAndIdempotencyKey(request.getPatientId(),idempotencyKey);
+
+        //prevent creating a duplicate appointment
+        if(existingAppointment.isPresent()) return mapToResponse(existingAppointment.get());
+
         AppointmentSlot slot = slotRepository.findById(request.getSlotId())
                 .orElseThrow(() -> new ResourceNotFoundException("Slot not found"));
 
@@ -59,6 +66,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .appointmentDate(slot.getSlotDate())
                 .appointmentTime(slot.getStartTime())
                 .status(AppointmentStatus.BOOKED)
+                .idempotencyKey(idempotencyKey)
                 .patientNotes(request.getReason())
                 .build();
 
@@ -67,7 +75,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         
         // Save
         Appointment savedAppointment = appointmentRepository.save(appointment);
-        slotRepository.save(slot); // Trigger version check
 
         return mapToResponse(savedAppointment);
     }
