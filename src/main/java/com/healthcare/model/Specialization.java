@@ -7,6 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "specializations", indexes = {
         @Index(name = "idx_specializations_name", columnList = "name")

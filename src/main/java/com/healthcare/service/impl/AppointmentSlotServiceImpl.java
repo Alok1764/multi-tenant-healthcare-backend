@@ -38,6 +38,8 @@ public class AppointmentSlotServiceImpl implements AppointmentSlotService {
                 .slotDate(appointmentSlotRequest.getSlotDate())
                 .startTime(appointmentSlotRequest.getStartTime())
                 .endTime(appointmentSlotRequest.getEndTime())
+                .maxAppointments(1)
+                .bookedAppointments(0)
                 .isAvailable(true)
                 .build();
         try{

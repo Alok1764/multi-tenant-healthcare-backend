@@ -59,16 +59,14 @@ public class AppointmentSlot extends BaseEntity {
     private Boolean isAvailable = true;
 
     @NotNull
-    @Builder.Default
     @Positive
     @Column(name = "max_appointments", nullable = false)
-    private Integer maxAppointments = 1;
+    private Integer maxAppointments;
 
     @NotNull
-    @Builder.Default
     @PositiveOrZero
     @Column(name = "booked_appointments", nullable = false)
-    private Integer bookedAppointments = 0;
+    private Integer bookedAppointments;
 
     // Bidirectional relationship
     @OneToMany(mappedBy = "appointmentSlot", cascade = CascadeType.ALL, orphanRemoval = true)

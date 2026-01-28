@@ -13,10 +13,14 @@ import com.healthcare.repository.DoctorRepository;
 import com.healthcare.repository.UserRepository;
 import com.healthcare.service.DoctorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -49,7 +53,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .hospital(hospitalRepository.findById(request.getHospitalId())
                         .orElseThrow(() -> new ResourceNotFoundException("Hospital not found with ID: " + request.getHospitalId())))
                 .licenseNumber(request.getLicenseNumber())
-                .specialization(specializationRepository.findByName(request.getSpecialization())
+                .specialization(specializationRepository.findByNameIgnoreCase(request.getSpecialization())
                         .orElseThrow(() -> new ResourceNotFoundException("Specialization not found: " + request.getSpecialization())))
                 .qualification(request.getQualification())
                 .experienceYears(request.getExperienceYears())
@@ -60,6 +64,15 @@ public class DoctorServiceImpl implements DoctorService {
 
         Doctor savedDoctor = doctorRepository.save(doctor);
         return mapToResponse(savedDoctor);
+    }
+
+    @Override
+    public List<DoctorResponse> getAllDoctors(Pageable pageable) {
+        return doctorRepository.findAll(pageable).getContent()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
     }
 
     @Override

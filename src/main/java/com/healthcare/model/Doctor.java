@@ -66,11 +66,13 @@ public class Doctor extends BaseEntity {
     @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
+    //for now let it be true
+    @Builder.Default
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = true;
 
     @Column(name = "is_verified", nullable = false)
-    private Boolean isVerified = false;
+    private Boolean isVerified;
 
     // Bidirectional relationships
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)

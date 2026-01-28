@@ -6,9 +6,13 @@ import com.healthcare.dto.response.DoctorResponse;
 import com.healthcare.service.DoctorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -25,10 +29,17 @@ public class DoctorController {
         return ResponseEntity.ok(doctorService.onboardDoctor(request));
     }
 
+    @GetMapping
+    public ResponseEntity<List<DoctorResponse>> getAllDoctors(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize){
+        return ResponseEntity.ok(doctorService.getAllDoctors(PageRequest.of(pageNo,pageSize)));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<DoctorResponse> getDoctorProfile(@PathVariable Long id) {
         return ResponseEntity.ok(doctorService.getDoctorProfile(id));
     }
+
 
     @PostMapping("/availability")
     @PreAuthorize("hasAuthority('DOCTOR')")
