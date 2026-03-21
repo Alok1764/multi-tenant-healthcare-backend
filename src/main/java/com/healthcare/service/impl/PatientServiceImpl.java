@@ -1,12 +1,15 @@
 package com.healthcare.service.impl;
 
-import com.healthcare.dto.request.PatientProfileRequest;
+import com.healthcare.dto.request.PatientAddRequest;
+import com.healthcare.dto.request.PatientProfileUpdateRequest;
 import com.healthcare.dto.response.PatientProfileResponse;
 import com.healthcare.exception.ResourceNotFoundException;
+import com.healthcare.model.Hospital;
 import com.healthcare.model.Patient;
 import com.healthcare.model.User;
 import com.healthcare.model.enums.BloodGroup;
 import com.healthcare.model.enums.Gender;
+import com.healthcare.repository.HospitalRepository;
 import com.healthcare.repository.PatientRepository;
 import com.healthcare.repository.UserRepository;
 import com.healthcare.service.PatientService;
@@ -21,35 +24,27 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final HospitalRepository hospitalRepository;
 
     @Override
     public PatientProfileResponse getPatientProfileByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
-        // Ensure patient record exists for user (if not, maybe auto-create or throw error)
-        // For now, let's assume registration creates a basic patient record or we create on fly
-        // But our current flow creates Patient only on booking if not exists?
-        // Actually UserService usually creates User. Patient entity is separate.
-        // Let's rely on finding by User ID.
-        
-        Patient patient = patientRepository.findByUserId(user.getId()).stream()
-                .findFirst()
+
+        Patient patient = patientRepository.findByUserId(user.getId())
                  .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found. Please book an appointment to initialize your profile."));
 
         return mapToResponse(patient);
     }
 
     @Override
-    public PatientProfileResponse updatePatientProfile(String email, PatientProfileRequest request) {
+    public PatientProfileResponse updatePatientProfile(String email, PatientProfileUpdateRequest request) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Patient patient = patientRepository.findByUserId(user.getId()).stream()
-                .findFirst()
+        Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
 
-        // Update User details (common fields)
         user.setPhoneNumber(request.getPhoneNumber());
         userRepository.save(user);
 
@@ -70,10 +65,40 @@ public class PatientServiceImpl implements PatientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
     }
 
+    @Override
+    public PatientProfileResponse addPatients(PatientAddRequest patientAddRequest) {
+
+        User user = userRepository.findById(patientAddRequest.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found, Please first assign as user"));
+
+        Hospital hospital = hospitalRepository.findById(patientAddRequest.getHospitalId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Hospital not found"));
+
+        Patient patient = Patient.builder()
+                .user(user)
+                .dateOfBirth(patientAddRequest.getDateOfBirth())
+                .gender(patientAddRequest.getGender())
+                .bloodGroup(patientAddRequest.getBloodGroup())
+                .address(patientAddRequest.getAddress())
+                .emergencyContactName(patientAddRequest.getEmergencyContactName())
+                .emergencyContactPhone(patientAddRequest.getEmergencyContactPhone())
+                .medicalHistory(patientAddRequest.getMedicalHistory())
+                .allergies(patientAddRequest.getAllergies())
+                .profileImageUrl(null)
+                .build();
+
+        Patient savedPatient = patientRepository.save(patient);
+
+        return mapToResponse(savedPatient);
+    }
+
+
+
     private PatientProfileResponse mapToResponse(Patient patient) {
         return PatientProfileResponse.builder()
                 .id(patient.getId())
-                .userId(patient.getUser().getId())
                 .fullName(patient.getUser().getFullName())
                 .email(patient.getUser().getEmail())
                 .phoneNumber(patient.getUser().getPhoneNumber())
@@ -81,6 +106,10 @@ public class PatientServiceImpl implements PatientService {
                 .dateOfBirth(patient.getDateOfBirth())
                 .gender(String.valueOf(patient.getGender()))
                 .bloodGroup(String.valueOf(patient.getBloodGroup()))
+                .emergencyContactName(patient.getEmergencyContactName())
+                .emergencyContactPhone(patient.getEmergencyContactPhone())
+                .medicalHistory(patient.getMedicalHistory())
+                .allergies(patient.getAllergies())
                 .active(patient.getUser().getIsActive())
                 .build();
     }

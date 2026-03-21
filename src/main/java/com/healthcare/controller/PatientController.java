@@ -1,6 +1,7 @@
 package com.healthcare.controller;
 
-import com.healthcare.dto.request.PatientProfileRequest;
+import com.healthcare.dto.request.PatientAddRequest;
+import com.healthcare.dto.request.PatientProfileUpdateRequest;
 import com.healthcare.dto.response.PatientProfileResponse;
 import com.healthcare.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,13 @@ public class PatientController {
 
     private final PatientService patientService;
 
+    @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_HOSPITAL_ADMIN')")
+    @Operation(summary = "Add Patient", description = "Adding Patient from users Db to Patient db")
+    public ResponseEntity<PatientProfileResponse> addPatients(@RequestBody @Valid PatientAddRequest patientAddRequest) {
+        return ResponseEntity.ok(patientService.addPatients(patientAddRequest));
+    }
+
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('ROLE_PATIENT')")
     @Operation(summary = "Get my profile", description = "Retrieve current logged-in patient's profile")
@@ -33,7 +41,7 @@ public class PatientController {
     @Operation(summary = "Update profile", description = "Update current logged-in patient's profile")
     public ResponseEntity<PatientProfileResponse> updateProfile(
             Authentication authentication,
-            @Valid @RequestBody PatientProfileRequest request) {
+            @Valid @RequestBody PatientProfileUpdateRequest request) {
         String email = authentication.getName();
         return ResponseEntity.ok(patientService.updatePatientProfile(email, request));
     }

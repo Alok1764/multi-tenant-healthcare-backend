@@ -81,7 +81,7 @@ public class Hospital extends BaseEntity {
 
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Patient> patients = new ArrayList<>();
+    private List<HospitalPatient> hospitalPatients = new ArrayList<>();
 
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -114,9 +114,9 @@ public class Hospital extends BaseEntity {
         doctor.setHospital(this);
     }
 
-    public void addPatient(Patient patient) {
-        patients.add(patient);
-        patient.setHospital(this);
+    public void addHospitalPatient(HospitalPatient hospitalPatient) {
+        hospitalPatients.add(hospitalPatient);
+        hospitalPatient.setHospital(this);
     }
 
     public void addAppointmentSlot(AppointmentSlot slot) {

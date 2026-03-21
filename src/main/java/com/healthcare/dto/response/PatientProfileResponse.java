@@ -1,5 +1,6 @@
 package com.healthcare.dto.response;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 public class PatientProfileResponse {
 
     private Long id;
-    private Long userId;
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -22,5 +22,9 @@ public class PatientProfileResponse {
     private LocalDate dateOfBirth;
     private String gender;
     private String bloodGroup;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+    private String medicalHistory;
+    private String allergies;
     private boolean active;
 }

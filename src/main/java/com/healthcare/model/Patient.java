@@ -10,16 +10,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "patients",
-       uniqueConstraints = {
-           @UniqueConstraint(name = "unique_patient_per_hospital",
-                           columnNames = {"hospital_id", "user_id"})
-       },
        indexes = {
-           @Index(name = "idx_patients_hospital_id", columnList = "hospital_id"),
-           @Index(name = "idx_patients_user_id", columnList = "user_id"),
-           @Index(name = "idx_patients_dob", columnList = "date_of_birth")
+           @Index(name = "idx_patients_user_id", columnList = "user_id")
        })
 @Data
 @NoArgsConstructor
@@ -27,10 +22,10 @@ import java.util.List;
 @Builder
 public class Patient extends BaseEntity {
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hospital_id", nullable = false)
-    private Hospital hospital;
+//    @NotNull
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "hospital_id", nullable = false)
+//    private Hospital hospital;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,6 +70,10 @@ public class Patient extends BaseEntity {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MedicalRecord> medicalRecords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<HospitalPatient> hospitalPatients = new ArrayList<>();
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

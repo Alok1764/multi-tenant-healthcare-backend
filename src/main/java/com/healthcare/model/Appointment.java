@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "appointments",
         uniqueConstraints = {
-        @UniqueConstraint(name = "uk_patient_idempotency",columnNames = {"patient_id,idempotency_key"})
+        @UniqueConstraint(name = "uk_patient_idempotency",columnNames = {"patient_id","idempotency_key"})
         },
         indexes = {
         @Index(name = "idx_appointments_hospital_id", columnList = "hospital_id"),

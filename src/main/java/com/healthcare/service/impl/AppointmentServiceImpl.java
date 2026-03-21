@@ -42,6 +42,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private AppointmentResponse bookAppointmentInternal(AppointmentRequest request,String idempotencyKey) {
 
+//        Patient patient=patientRepository.findBy()
+
         Optional<Appointment> existingAppointment=appointmentRepository.findByPatientIdAndIdempotencyKey(request.getPatientId(),idempotencyKey);
 
         //prevent creating a duplicate appointment
@@ -57,7 +59,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
-        // Create appointment
         Appointment appointment = Appointment.builder()
                 .hospital(slot.getHospital())
                 .doctor(slot.getDoctor())

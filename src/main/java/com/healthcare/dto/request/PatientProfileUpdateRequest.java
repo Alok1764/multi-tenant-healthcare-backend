@@ -12,7 +12,10 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientProfileRequest {
+public class PatientProfileUpdateRequest {
+
+    @NotBlank
+    private Long patientId;
 
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
@@ -21,8 +24,7 @@ public class PatientProfileRequest {
     private String address;
 
     private LocalDate dateOfBirth;
-    
-    // Gender, BloodGroup can be added here
+
     private String gender;
     private String bloodGroup;
 }
