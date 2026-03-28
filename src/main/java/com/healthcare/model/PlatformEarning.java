@@ -9,6 +9,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "platform_earnings", indexes = {
         @Index(name = "idx_platform_earnings_hospital_id", columnList = "hospital_id"),

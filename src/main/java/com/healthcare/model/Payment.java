@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "payments", indexes = {
         @Index(name = "idx_payments_hospital_id", columnList = "hospital_id"),

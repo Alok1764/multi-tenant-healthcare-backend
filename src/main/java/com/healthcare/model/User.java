@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_users_email", columnList = "email"),
@@ -29,8 +30,8 @@ public class User extends BaseEntity {
     private String email;
 
     @NotBlank
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    @Column(name="password_hash" ,nullable = false)
+    private String password_hash;
 
     @NotBlank
     @Column(name = "full_name", nullable = false)

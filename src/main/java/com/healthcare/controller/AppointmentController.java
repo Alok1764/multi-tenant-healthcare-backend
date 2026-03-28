@@ -2,12 +2,15 @@ package com.healthcare.controller;
 
 import com.healthcare.dto.request.AppointmentRequest;
 import com.healthcare.dto.response.AppointmentResponse;
+import com.healthcare.security.UserPrincipal;
 import com.healthcare.service.AppointmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
+@Tag(name = "Appointment Management", description = "Endpoints for managing Appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -23,9 +27,10 @@ public class AppointmentController {
     @PreAuthorize("hasAuthority('ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> bookAppointment(
             @RequestHeader("X-Idempotency-Key")String idempotencyKey,
-            @RequestBody @Valid AppointmentRequest request
+            @RequestBody @Valid AppointmentRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.bookAppointment(request,idempotencyKey));
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.bookAppointment(request,idempotencyKey,userPrincipal));
     }
 
     @GetMapping("/{id}")

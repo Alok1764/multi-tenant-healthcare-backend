@@ -35,6 +35,7 @@ public class DoctorController {
             @RequestParam(defaultValue = "10") int pageSize){
         return ResponseEntity.ok(doctorService.getAllDoctors(PageRequest.of(pageNo,pageSize)));
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<DoctorResponse> getDoctorProfile(@PathVariable Long id) {
         return ResponseEntity.ok(doctorService.getDoctorProfile(id));

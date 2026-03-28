@@ -70,6 +70,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return token;
     }
 
+    @Override
     @Transactional
     public void revokeToken(RefreshToken token) {
         token.setIsRevoked(true);
@@ -98,5 +99,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 
 
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        RefreshToken Token=findByToken(refreshToken)
+                .map(this::verifyExpiration)
+                .orElseThrow(()-> new TokenRefreshException("Invalid refresh Token"));
+
+        revokeToken(Token);
     }
 }

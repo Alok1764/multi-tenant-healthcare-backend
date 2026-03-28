@@ -11,9 +11,12 @@ import com.healthcare.model.enums.AppointmentStatus;
 import com.healthcare.repository.AppointmentRepository;
 import com.healthcare.repository.AppointmentSlotRepository;
 import com.healthcare.repository.PatientRepository;
+import com.healthcare.security.UserPrincipal;
 import com.healthcare.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,17 +35,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientRepository patientRepository;
 
     @Override
-    public AppointmentResponse bookAppointment(AppointmentRequest request,String idempotencyKey) {
+    public AppointmentResponse bookAppointment(AppointmentRequest request, String idempotencyKey, UserPrincipal userPrincipal) {
         try {
-            return bookAppointmentInternal(request,idempotencyKey);
+            return bookAppointmentInternal(request,idempotencyKey,userPrincipal);
         } catch (ObjectOptimisticLockingFailureException e) {
             throw new ResourceConflictException("This slot was just booked by someone else. Please try another slot.");
         }
     }
 
-    private AppointmentResponse bookAppointmentInternal(AppointmentRequest request,String idempotencyKey) {
+    private AppointmentResponse bookAppointmentInternal(AppointmentRequest request,String idempotencyKey, UserPrincipal userPrincipal) {
 
-//        Patient patient=patientRepository.findBy()
+        Patient patient = patientRepository.findByIdAndUserId(request.getPatientId(),userPrincipal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
         Optional<Appointment> existingAppointment=appointmentRepository.findByPatientIdAndIdempotencyKey(request.getPatientId(),idempotencyKey);
 
@@ -56,8 +60,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResourceConflictException("Slot is not available");
         }
 
-        Patient patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+
 
         Appointment appointment = Appointment.builder()
                 .hospital(slot.getHospital())
@@ -71,10 +74,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .patientNotes(request.getReason())
                 .build();
 
-        // Update slot availability (Managed Entity)
+
         slot.addAppointment(appointment);
-        
-        // Save
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
         return mapToResponse(savedAppointment);

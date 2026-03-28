@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type;
 import java.time.LocalDate;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "medical_records",
        uniqueConstraints = {

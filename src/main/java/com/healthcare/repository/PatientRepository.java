@@ -1,17 +1,9 @@
 package com.healthcare.repository;
 
 import com.healthcare.model.Patient;
-import com.healthcare.model.enums.BloodGroup;
-import com.healthcare.model.enums.Gender;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,6 +19,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 //    Optional<Patient> findByUserIdAndHospitalId(Long userId, Long hospitalId);
 
 
+    Optional<Patient> findByIdAndUserId(Long userId, Long id);
     Optional<Patient> findByUserId(Long userId);
 
 //    // Demographic queries

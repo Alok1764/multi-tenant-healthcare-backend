@@ -1,6 +1,7 @@
 package com.healthcare.controller;
 
 import com.healthcare.dto.request.LoginRequest;
+import com.healthcare.dto.request.LogoutRequest;
 import com.healthcare.dto.request.RefreshTokenRequest;
 import com.healthcare.dto.request.UserRegistrationRequest;
 import com.healthcare.dto.response.AuthenticationResponse;
@@ -15,8 +16,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,5 +54,11 @@ public class AuthController {
             @RequestBody @Valid RefreshTokenRequest request
     ) {
         return ResponseEntity.ok(refreshTokenService.refreshToken(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
+         refreshTokenService.logout(request.getRefreshToken());
+         return ResponseEntity.noContent().build();
     }
 }
