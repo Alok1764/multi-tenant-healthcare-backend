@@ -1,109 +1,375 @@
-# Healthcare Application
+# Multi-Tenant Healthcare Backend
 
-A Spring Boot 4.0.0 application with PostgreSQL, JWT authentication, and comprehensive API documentation.
+> **Want to test the APIs right away? Jump to → [Quick Start & Testing](#quick-start--testing)**
 
-## Technologies Used
+---
 
-- **Spring Boot 4.0.0** (Java 17)
-- **Spring Web** - RESTful API
-- **Spring Security** - Authentication & Authorization
-- **Spring Data JPA** - Database ORM
-- **MySQL** - Database
-- **Lombok** - Boilerplate code reduction
-- **Bean Validation** - Input validation
-- **JWT (JJWT 0.12.3)** - Token-based authentication
+## Table of Contents
 
-## Prerequisites
+- [What Is This Project?](#what-is-this-project)
+- [What Was Asked vs What Was Built](#what-was-asked-vs-what-was-built)
+- [System Overview](#system-overview)
+- [Tech Stack](#tech-stack)
+- [Quick Start & Testing](#quick-start--testing)
+- [How to Test the APIs](#how-to-test-the-apis)
+- [Role Guide](#role-guide)
+- [Authentication Flow](#authentication-flow)
+- [Complete API Reference](#complete-api-reference)
+- [Frontend UI](#frontend-ui)
+- [Database Schema](#database-schema)
+- [Scalability Notes](#scalability-notes)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
 
-- Java 17 or higher
-- Maven 3.6+
-- MySQL
+---
 
-## Database Setup
+## What Is This Project?
 
-1. Install MySQL
-2. Create a database:
+This is a **production-grade REST API** for a multi-tenant hospital management system — built to demonstrate secure, scalable backend engineering.
+
+**Don't worry if you're not a Java/Spring Boot developer.** This guide is written for everyone. You don't need to understand the code — just follow the steps and you'll have the entire system running and testable in minutes through a clean browser UI.
+
+---
+
+## What Was Asked vs What Was Built
+
+| Requirement | Status | What's Implemented |
+|---|---|---|
+| User Registration & Login | Exceeded | JWT access tokens + refresh token rotation |
+| Role-Based Access Control | Exceeded | 5 roles: PATIENT, DOCTOR, HOSPITAL_ADMIN, ADMIN, USER |
+| CRUD APIs for a secondary entity | Exceeded | Full CRUD across 7 modules |
+| API Versioning & Error Handling | Done | Global exception handler, structured error responses |
+| Input Validation | Done | Bean Validation on all request bodies |
+| API Documentation | Done | Interactive Swagger UI — test every endpoint in the browser |
+| Database Schema | Done | MySQL with normalized relational schema |
+| Security | Done | BCrypt hashing, JWT, idempotency keys, stateless auth |
+| Caching (Optional) | Done | Redis caching on read-heavy endpoints |
+| Docker (Optional) | Done | Full Docker + Docker Compose setup |
+| Frontend UI | In Progress | React.js frontend (see [Frontend UI](#frontend-ui)) |
+
+---
+
+## System Overview
+
+This API manages the full lifecycle of a hospital ecosystem:
+
+```
+Hospital Admin  →  Creates hospitals, onboards doctors, manages specializations
+Doctor          →  Sets availability, manages appointment slots, creates medical records
+Patient         →  Books appointments, views medical history, processes payments
+```
+
+### Modules Built
+
+- **Authentication** — Register, login, token refresh, logout
+- **Patient Management** — Patient profiles, self-service updates
+- **Doctor Management** — Onboarding, availability scheduling
+- **Appointment Management** — Booking with idempotency, cancellation
+- **Hospital Management** — Multi-hospital support
+- **Appointment Slots** — Doctor availability windows
+- **Specialization Management** — Medical specializations (soft delete)
+- **Medical Records** — Per-appointment clinical records
+- **Payment Management** — Appointment payment processing
+
+---
+
+## Tech Stack
+
+> You don't need to know any of this to run the project — it's just for reference.
+
+| Layer | Technology |
+|---|---|
+| Language | Java 17 |
+| Framework | Spring Boot 3.2.1 |
+| Database | MySQL 8 |
+| Authentication | JWT (Access + Refresh Tokens) |
+| Caching | Redis |
+| API Docs | Swagger / OpenAPI 3 |
+| Build Tool | Maven |
+| Containerization | Docker + Docker Compose |
+
+---
+
+## Quick Start & Testing
+
+There are two ways to run this project. **Option A (Docker) is strongly recommended** — it requires no Java or Maven knowledge at all.
+
+---
+
+### Option A — Docker (Recommended)
+
+**Prerequisites:** Just [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed on your machine.
+
+**Step 1 — Clone the repository**
+```bash
+git clone https://github.com/Alok1764/multi-tenant-healthcare-backend.git
+cd multi-tenant-healthcare-backend
+```
+
+**Step 2 — Start everything with one command**
+```bash
+docker-compose up --build
+```
+
+This automatically starts:
+- The Spring Boot API on `http://localhost:8080`
+- MySQL database on port `3306`
+- Redis cache on port `6379`
+
+Wait about 30 seconds for everything to initialize. You'll see `Started HealthcareApplication` in the logs when it's ready.
+
+**Step 3 — Open Swagger UI**
+
+Go to: **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+
+You're ready to test.
+
+**To stop:**
+```bash
+docker compose down
+```
+
+---
+
+### Option B — Run Locally (Without Docker)
+
+**Prerequisites:**
+- [Java 17+](https://adoptium.net/) — download and install
+- [Maven 3.8+](https://maven.apache.org/download.cgi) — download and install
+- [MySQL 8](https://dev.mysql.com/downloads/mysql/) — running locally
+
+**Step 1 — Clone the repository**
+```bash
+git clone https://github.com/Alok1764/multi-tenant-healthcare-backend.git
+cd multi-tenant-healthcare-backend
+```
+
+**Step 2 — Create the database**
+
+Open MySQL and run:
 ```sql
 CREATE DATABASE healthcare_system;
 ```
 
-## Running the Application
+**Step 3 — Configure the application**
 
-```bash
-mvn clean install
-mvn spring-boot:run
+Open `src/main/resources/application.properties` and update these lines:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/healthcare_system
+spring.datasource.username=YOUR_MYSQL_USERNAME
+spring.datasource.password=YOUR_MYSQL_PASSWORD
 ```
 
-The application will start on `http://localhost:8080`
+**Step 4 — Run the application**
+```bash
+./mvnw spring-boot:run
+```
 
-## API Documentation
+Wait for `Started HealthcareApplication` in the console.
 
-Once the application is running, access the Swagger UI at:
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **API Docs**: http://localhost:8080/api-docs
+**Step 5 — Open Swagger UI**
+
+Go to: **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+
+---
+
+## How to Test the APIs
+
+Everything is testable through the **Swagger UI** in your browser — no Postman, no curl, no code needed.
+
+### Step 1 — Register a user
+
+In Swagger UI:
+1. Find the **Authentication** section
+2. Click `POST /api/auth/register`
+3. Click **Try it out**
+4. Paste this into the request body:
+```json
+{
+  "name": "Test@123",
+  "email": "testuser@example.com",
+  "password": "Password@123",
+  "role": "ROLE_PATIENT"
+}
+```
+5. Click **Execute**
+6. You'll get back an `accessToken` and a `refreshToken`
+
+### Step 2 — Authorize in Swagger
+
+1. Copy the `accessToken` from the response
+2. Click the **Authorize** button at the top right of the Swagger page
+3. Paste the token in the field (the `Bearer ` prefix is added automatically)
+4. Click **Authorize** then **Close**
+
+All protected endpoints are now unlocked for your session.
+
+### Step 3 — Test any endpoint
+
+Every endpoint shows exactly:
+- What it does
+- What roles can access it
+- What the request body should look like
+- What response codes to expect
+
+---
+
+## Role Guide
+
+| Role | What They Can Do |
+|---|---|
+| `ROLE_PATIENT` | Book appointments, view own profile, view medical records, make payments |
+| `ROLE_DOCTOR` | Manage availability, view appointments, create medical records |
+| `ROLE_HOSPITAL_ADMIN` | Onboard doctors, create hospitals, manage specializations, add patients |
+| `ROLE_ADMIN` | View medical records, system-wide access |
+
+To test a specific role, register with that role string in the `role` field during registration.
+
+---
+
+## Authentication Flow
+
+```
+1. POST /api/auth/register   →  Get accessToken + refreshToken
+2. Use accessToken in Authorization header: Bearer <token>
+3. When accessToken expires → POST /api/auth/refresh-token with refreshToken
+4. POST /api/auth/logout     →  Invalidates refresh token server-side
+```
+
+Access tokens are **short-lived** (15 minutes by default). Refresh tokens are **long-lived** (7 days). This is industry-standard token rotation — the same pattern used by Google, GitHub, and most modern APIs.
+
+---
+
+## Complete API Reference
+
+| Module | Endpoint | Method | Role Required |
+|---|---|---|---|
+| **Auth** | `/api/auth/register` | POST | Public |
+| | `/api/auth/login` | POST | Public |
+| | `/api/auth/refresh-token` | POST | Public |
+| | `/api/auth/logout` | POST | Public |
+| **Patient** | `/api/patients` | POST | HOSPITAL_ADMIN |
+| | `/api/patients/me` | GET | PATIENT |
+| | `/api/patients/profile` | PUT | PATIENT |
+| **Doctor** | `/api/doctors` | POST | HOSPITAL_ADMIN |
+| | `/api/doctors` | GET | Public |
+| | `/api/doctors/{id}` | GET | Public |
+| | `/api/doctors/availability` | POST | DOCTOR |
+| **Appointment** | `/api/appointments/book` | POST | PATIENT |
+| | `/api/appointments/{id}` | GET | Authenticated |
+| | `/api/appointments/patient/{patientId}` | GET | PATIENT, DOCTOR |
+| | `/api/appointments/doctor/{doctorId}` | GET | DOCTOR |
+| | `/api/appointments/{id}/cancel` | POST | PATIENT, DOCTOR |
+| **Hospital** | `/api/hospitals` | POST | HOSPITAL_ADMIN |
+| | `/api/hospitals/{id}` | GET | Public |
+| | `/api/hospitals` | GET | Public |
+| **Appointment Slots** | `/api/appointment-slots` | POST | DOCTOR, HOSPITAL_ADMIN |
+| **Specialization** | `/api/specializations` | POST | HOSPITAL_ADMIN |
+| | `/api/specializations/{id}` | GET | Public |
+| | `/api/specializations` | GET | Public |
+| | `/api/specializations/{id}` | PUT | HOSPITAL_ADMIN |
+| | `/api/specializations/{id}` | DELETE | HOSPITAL_ADMIN |
+| **Medical Records** | `/api/medical-records` | POST | DOCTOR |
+| | `/api/medical-records/{id}` | GET | DOCTOR, PATIENT, ADMIN |
+| | `/api/medical-records/patient/{patientId}` | GET | DOCTOR, PATIENT, ADMIN |
+| **Payment** | `/api/payments/pay` | POST | PATIENT |
+| | `/api/payments/appointment/{appointmentId}` | GET | PATIENT, ADMIN |
+
+---
+
+## Frontend UI
+
+A lightweight React.js frontend is currently in development to visually demonstrate the API capabilities.
+
+**Planned screens:**
+- Registration & Login page
+- Patient dashboard — view profile, appointments, medical records
+- Doctor dashboard — manage availability and slots
+- Admin panel — manage hospitals, doctors, specializations
+- Appointment booking flow with payment
+
+**Until then**, the Swagger UI at `/swagger-ui/index.html` provides a fully interactive interface to test every single API endpoint with real request/response data — which is actually more useful for API evaluation than a basic frontend.
+
+---
+
+## Database Schema
+
+The schema is automatically created by the application on first run (via Hibernate auto-DDL). Key relationships:
+
+```
+User (base)
+  ├── Patient (extends User)
+  └── Doctor  (extends User, has Specialization)
+
+Hospital
+  └── has many Doctors
+
+Doctor
+  └── has Availability → generates AppointmentSlots
+
+AppointmentSlot
+  └── booked into Appointment
+
+Appointment
+  ├── has MedicalRecord
+  └── has Payment
+```
+
+---
+
+## Scalability Notes
+
+This project is built with production scalability in mind, not just as a demo:
+
+**Stateless Authentication** — JWT means any number of server instances can validate tokens without shared session state. Horizontal scaling works out of the box.
+
+**Redis Caching** — Read-heavy endpoints (doctor listings, hospital listings, specializations) are cached in Redis, reducing database load significantly as traffic grows.
+
+**Idempotency Keys** — The appointment booking endpoint requires an `X-Idempotency-Key` header. This prevents duplicate bookings if a client retries a failed request — a critical pattern for payment and booking systems at scale.
+
+**Soft Deletes** — Specializations and other entities use soft deletes (deactivation) rather than hard deletes, preserving referential integrity and audit history.
+
+**Modular Structure** — Every feature is a self-contained module (controller → service → repository). Adding a new feature doesn't touch existing code. This structure maps directly to a microservices split if the system needs to scale further.
+
+**Docker Ready** — The entire stack (API + MySQL + Redis) runs in containers, making deployment to any cloud provider (AWS, GCP, Azure) straightforward.
+
+---
 
 ## Project Structure
 
 ```
 src/main/java/com/healthcare/
-├── config/          # Configuration classes
-├── controller/      # REST controllers
-├── service/         # Business logic
-├── repository/      # Data access layer
-├── model/           # JPA entities
-├── dto/             # Data Transfer Objects
-├── security/        # JWT & security components
-└── exception/       # Custom exceptions
-
-src/main/resources/
-├── application.properties  # Application configuration
-
+├── controller/       # API endpoints (one file per module)
+├── service/          # Business logic
+├── repository/       # Database queries
+├── dto/
+│   ├── request/      # Incoming request bodies
+│   └── response/     # Outgoing response shapes
+├── model/            # Database entities
+├── security/         # JWT, UserDetails, filters
+├── exception/        # Global error handling
+├── config/           # Spring configuration
+└── swagger/          # API documentation annotations
 ```
 
-## Database Schema
+---
 
-The application includes a comprehensive database schema with 15 tables supporting multi-tenant architecture. See `src/main/resources/db/migration/` for migration files.
+## Environment Variables
 
-### Schema Overview
-- **V1**: Users and authentication (users, refresh_tokens)
-- **V2**: Hospitals and subscriptions (subscription_plans, hospitals, hospital_subscriptions)
-- **V3**: Doctors and patients (specializations, doctors, patients)
-- **V4**: Appointments (appointment_slots, appointments)
-- **V5**: Medical records (medical_records)
-- **V6**: Payments (payments, platform_earnings)
+If running with Docker, these are pre-configured in `docker-compose.yml`. For local setup, set them in `application.properties`:
 
+| Variable | Description | Default |
+|---|---|---|
+| `DB_URL` | MySQL connection URL | `localhost:3306/healthcare_db` |
+| `DB_USERNAME` | MySQL username | `root` |
+| `DB_PASSWORD` | MySQL password | — |
+| `JWT_SECRET` | Secret key for signing JWT tokens | — |
+| `JWT_EXPIRY_MS` | Access token expiry in milliseconds | `900000` (15 min) |
+| `REFRESH_TOKEN_EXPIRY_DAYS` | Refresh token expiry | `7` |
+| `REDIS_HOST` | Redis host | `localhost` |
 
-## Configuration
+---
 
-Key configurations in `application.properties`:
-- **Server Port**: 8080
-- **Database**: MySQL on localhost:3306
-- **JPA**: `ddl-auto: update` (auto-create tables from entities)
-- **JWT Secret**: Configured for token generation
-- **JWT Expiration**: 24 hours (access token), 7 days (refresh token)
+## Questions?
 
-## Security
-
-The application uses JWT-based authentication. Implement security configurations in the `com.healthcare.security` package.
-
-## Development
-
-- Use Lombok annotations to reduce boilerplate code
-- Follow the layered architecture: Controller → Service → Repository
-- Add validation annotations to DTOs
-- Run SQL migrations manually or let JPA auto-create tables
-- Document APIs using SpringDoc annotations
-
-## Testing
-
-Run tests with:
-```bash
-mvn test
-```
-
-## Building for Production
-
-```bash
-mvn clean package
-java -jar target/healthcare-app-0.0.1-SNAPSHOT.jar
-```
+If anything doesn't work or you need a specific scenario tested, the Swagger UI has full documentation on every request and response. All edge cases (invalid tokens, wrong roles, duplicate bookings) return structured JSON error responses with clear messages.
