@@ -23,7 +23,7 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
-                user.getPassword_hash(),
+                user.getPasswordHash(),
                 user.getIsActive(),
                 List.of(() ->user.getRole().name())
         );

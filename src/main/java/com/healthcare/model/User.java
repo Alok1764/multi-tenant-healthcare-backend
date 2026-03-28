@@ -31,7 +31,7 @@ public class User extends BaseEntity {
 
     @NotBlank
     @Column(name="password_hash" ,nullable = false)
-    private String password_hash;
+    private String passwordHash;
 
     @NotBlank
     @Column(name = "full_name", nullable = false)

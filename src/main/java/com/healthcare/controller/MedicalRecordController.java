@@ -3,7 +3,9 @@ package com.healthcare.controller;
 import com.healthcare.dto.request.MedicalRecordRequest;
 import com.healthcare.dto.response.MedicalRecordResponse;
 import com.healthcare.service.MedicalRecordService;
-import io.swagger.v3.oas.annotations.Operation;
+import com.healthcare.swagger.medicalrecord.CreateMedicalRecordDoc;
+import com.healthcare.swagger.medicalrecord.GetMedicalRecordDoc;
+import com.healthcare.swagger.medicalrecord.GetPatientMedicalRecordsDoc;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,29 +19,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/medical-records")
 @RequiredArgsConstructor
-@Tag(name = "Medical Records", description = "Endpoints for managing medical records")
+@Tag(name = "Medical Records")
 public class MedicalRecordController {
 
     private final MedicalRecordService medicalRecordService;
 
+    @CreateMedicalRecordDoc
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_DOCTOR')")
-    @Operation(summary = "Create a medical record", description = "Create a new medical record for an appointment (Doctors only)")
-    public ResponseEntity<MedicalRecordResponse> createMedicalRecord(@Valid @RequestBody MedicalRecordRequest request) {
-        MedicalRecordResponse response = medicalRecordService.createMedicalRecord(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<MedicalRecordResponse> createMedicalRecord(
+            @Valid @RequestBody MedicalRecordRequest request
+    ) {
+        return new ResponseEntity<>(medicalRecordService.createMedicalRecord(request), HttpStatus.CREATED);
     }
 
+    @GetMedicalRecordDoc
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_DOCTOR', 'ROLE_PATIENT', 'ROLE_ADMIN')")
-    @Operation(summary = "Get medical record by ID", description = "Retrieve a specific medical record")
     public ResponseEntity<MedicalRecordResponse> getMedicalRecord(@PathVariable Long id) {
         return ResponseEntity.ok(medicalRecordService.getMedicalRecord(id));
     }
 
+    @GetPatientMedicalRecordsDoc
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyAuthority('ROLE_DOCTOR', 'ROLE_PATIENT', 'ROLE_ADMIN')")
-    @Operation(summary = "Get patient medical records", description = "Retrieve all medical records for a specific patient")
     public ResponseEntity<List<MedicalRecordResponse>> getPatientMedicalRecords(@PathVariable Long patientId) {
         return ResponseEntity.ok(medicalRecordService.getPatientMedicalRecords(patientId));
     }
