@@ -15,9 +15,6 @@ import java.time.LocalDate;
 @Builder
 public class PatientAddRequest {
 
-    @NotNull(message = "Hospital ID is required")
-    private Long hospitalId;
-
     @NotNull(message = "User ID is required")
     private Long userId;
 

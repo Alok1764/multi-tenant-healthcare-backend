@@ -14,6 +14,8 @@ import com.healthcare.repository.PatientRepository;
 import com.healthcare.security.UserPrincipal;
 import com.healthcare.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientRepository patientRepository;
 
     @Override
+    @CacheEvict(value = {"appointments", "patient-appointments", "doctor-appointments"}, allEntries = true)
     public AppointmentResponse bookAppointment(AppointmentRequest request, String idempotencyKey, UserPrincipal userPrincipal) {
         try {
             return bookAppointmentInternal(request,idempotencyKey,userPrincipal);
@@ -82,6 +85,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Cacheable(value = "appointments", key = "#id")
     public AppointmentResponse getAppointment(Long id) {
         return appointmentRepository.findById(id)
                 .map(this::mapToResponse)
@@ -89,6 +93,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Cacheable(value = "patient-appointments", key = "#patientId")
     public List<AppointmentResponse> getPatientAppointments(Long patientId) {
         return appointmentRepository.findByPatientId(patientId).stream()
                 .map(this::mapToResponse)
@@ -96,6 +101,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Cacheable(value = "doctor-appointments", key = "#doctorId")
     public List<AppointmentResponse> getDoctorAppointments(Long doctorId) {
         return appointmentRepository.findByDoctorId(doctorId).stream()
                 .map(this::mapToResponse)
@@ -103,6 +109,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @CacheEvict(value = {"appointments", "patient-appointments", "doctor-appointments"}, allEntries = true)
     public void cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));

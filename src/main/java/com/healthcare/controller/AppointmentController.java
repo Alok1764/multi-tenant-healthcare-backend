@@ -43,7 +43,7 @@ public class AppointmentController {
 
     @GetAppointmentDoc
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> getAppointment(@PathVariable Long id) {
         return ResponseEntity.ok(appointmentService.getAppointment(id));
     }

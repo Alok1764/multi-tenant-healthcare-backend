@@ -8,6 +8,8 @@ import com.healthcare.model.Specialization;
 import com.healthcare.repository.SpecializationRepository;
 import com.healthcare.service.SpecializationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,8 @@ public class SpecializationServiceImpl implements SpecializationService {
     private final SpecializationRepository specializationRepository;
 
     @Override
+
+    @CacheEvict(value = {"specializations", "specializations-all"}, allEntries = true)
     public SpecializationResponse create(SpecializationCreateRequest request) {
 
         if(specializationRepository.existsByNameIgnoreCase(request.getName()))
@@ -36,6 +40,7 @@ public class SpecializationServiceImpl implements SpecializationService {
     }
 
     @Override
+    @CacheEvict(value = {"specializations", "specializations-all"}, allEntries = true)
     public SpecializationResponse update(Long id, SpecializationUpdateRequest request) {
 
         Specialization specialization=specializationRepository.findById(id)
@@ -49,6 +54,7 @@ public class SpecializationServiceImpl implements SpecializationService {
     }
 
     @Override
+    @Cacheable(value = "specializations", key = "#id")
     @Transactional(readOnly = true)
     public SpecializationResponse getById(Long id) {
         return mapToResponse(specializationRepository.findById(id)
@@ -57,6 +63,7 @@ public class SpecializationServiceImpl implements SpecializationService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "specializations-all")
     public List<SpecializationResponse> getAllActive() {
         return specializationRepository.findByIsActive(true)
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -72,6 +79,7 @@ public class SpecializationServiceImpl implements SpecializationService {
 
 
     @Override
+    @CacheEvict(value = {"specializations", "specializations-all"}, allEntries = true)
     public void deactivate(Long id) {
         specializationRepository.deActivate(id);
     }

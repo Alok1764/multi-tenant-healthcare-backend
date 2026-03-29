@@ -13,6 +13,8 @@ import com.healthcare.repository.AppointmentRepository;
 import com.healthcare.repository.PaymentRepository;
 import com.healthcare.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     private static final BigDecimal CONSULTATION_FEE = new BigDecimal("500.00"); // Mock fixed fee
 
     @Override
+    @CacheEvict(value = "payments", allEntries = true)
     public PaymentResponse processPayment(PaymentRequest request) {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
@@ -67,6 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Cacheable(value = "payments", key = "#appointmentId")
     public PaymentResponse getPaymentByAppointmentId(Long appointmentId) {
         Payment payment = paymentRepository.findByAppointmentId(appointmentId).stream()
                 .filter(p -> p.getPaymentStatus() == TransactionStatus.COMPLETED)

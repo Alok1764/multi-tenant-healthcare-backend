@@ -11,6 +11,8 @@ import com.healthcare.repository.AppointmentRepository;
 import com.healthcare.repository.MedicalRecordRepository;
 import com.healthcare.service.MedicalRecordService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     private final AppointmentRepository appointmentRepository;
 
     @Override
+    @CacheEvict(value = {"medical-records", "patient-medical-records"}, allEntries = true)
+
     public MedicalRecordResponse createMedicalRecord(MedicalRecordRequest request) {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
@@ -69,6 +73,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
+    @Cacheable(value = "medical-records", key = "#id")
     public MedicalRecordResponse getMedicalRecord(Long id) {
         return medicalRecordRepository.findById(id)
                 .map(this::mapToResponse)
@@ -76,6 +81,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     }
 
     @Override
+
+    @Cacheable(value = "patient-medical-records", key = "#patientId")
     public List<MedicalRecordResponse> getPatientMedicalRecords(Long patientId) {
         return medicalRecordRepository.findByPatientId(patientId).stream()
                 .map(this::mapToResponse)

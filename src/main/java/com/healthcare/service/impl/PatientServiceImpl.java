@@ -72,9 +72,6 @@ public class PatientServiceImpl implements PatientService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found, Please first assign as user"));
 
-        Hospital hospital = hospitalRepository.findById(patientAddRequest.getHospitalId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Hospital not found"));
 
         Patient patient = Patient.builder()
                 .user(user)

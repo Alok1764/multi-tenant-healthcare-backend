@@ -8,6 +8,8 @@ import com.healthcare.model.Hospital;
 import com.healthcare.repository.HospitalRepository;
 import com.healthcare.service.HospitalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class HospitalServiceImpl implements HospitalService {
     private final HospitalRepository hospitalRepository;
 
     @Override
+    @CacheEvict(value = {"hospitals", "hospitals-all"}, allEntries = true)
     public HospitalResponse createHospital(HospitalRequest request) {
         if (hospitalRepository.existsByEmail(request.getEmail())) {
             throw new ResourceConflictException("Hospital with this email already exists");
@@ -47,6 +50,7 @@ public class HospitalServiceImpl implements HospitalService {
     }
 
     @Override
+    @Cacheable(value = "hospitals", key = "#id")
     public HospitalResponse getHospital(Long id) {
         return hospitalRepository.findById(id)
                 .map(this::mapToResponse)
@@ -54,6 +58,7 @@ public class HospitalServiceImpl implements HospitalService {
     }
 
     @Override
+    @Cacheable(value = "hospitals-all")
     public List<HospitalResponse> getAllHospitals() {
         return hospitalRepository.findAll().stream()
                 .map(this::mapToResponse)

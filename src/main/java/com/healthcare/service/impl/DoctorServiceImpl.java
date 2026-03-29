@@ -13,6 +13,8 @@ import com.healthcare.repository.DoctorRepository;
 import com.healthcare.repository.UserRepository;
 import com.healthcare.service.DoctorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final com.healthcare.repository.HospitalRepository hospitalRepository;
 
     @Override
+    @CacheEvict(value = {"doctors", "doctors-all"}, allEntries = true)
     public DoctorResponse onboardDoctor(DoctorRegistrationRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.getUserId()));
@@ -67,6 +70,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Cacheable(value = "doctors-all", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public List<DoctorResponse> getAllDoctors(Pageable pageable) {
         return doctorRepository.findAll(pageable).getContent()
                 .stream()
@@ -76,6 +80,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @Cacheable(value = "doctors", key = "#id")
     public DoctorResponse getDoctorProfile(Long doctorId) {
         return doctorRepository.findById(doctorId)
                 .map(this::mapToResponse)
@@ -96,6 +101,7 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    @CacheEvict(value = {"doctors", "doctors-all"}, allEntries = true)
     public void setAvailability(AvailabilityRequest request) {
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + request.getDoctorId()));
