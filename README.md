@@ -45,7 +45,7 @@ This is a **production-grade REST API** for a multi-tenant hospital management s
 | Security | Done | BCrypt hashing, JWT, idempotency keys, stateless auth |
 | Caching (Optional) | Done | Redis caching on read-heavy endpoints |
 | Docker (Optional) | Done | Full Docker + Docker Compose setup |
-| Frontend UI | In Progress | React.js frontend (see [Frontend UI](#frontend-ui)) |
+| Frontend UI | Done | React.js frontend (see [Frontend UI](#frontend-ui)) |
 
 ---
 
@@ -83,7 +83,7 @@ Patient         →  Books appointments, views medical history, processes paymen
 | Framework | Spring Boot 3.2.1 |
 | Database | MySQL 8 |
 | Authentication | JWT (Access + Refresh Tokens) |
-| Caching | Redis |
+| Caching | Internal cache |
 | API Docs | Swagger / OpenAPI 3 |
 | Build Tool | Maven |
 | Containerization | Docker + Docker Compose |
@@ -114,11 +114,16 @@ docker-compose up --build
 This automatically starts:
 - The Spring Boot API on `http://localhost:8080`
 - MySQL database on port `3306`
-- Redis cache on port `6379`
+
+> **Note:** If you have MySQL installed locally, make sure to stop it first before running Docker — otherwise port 3306 will conflict. On Windows: `Services → MySQL → Stop`. On Mac: `System Preferences → MySQL → Stop`.
 
 Wait about 30 seconds for everything to initialize. You'll see `Started HealthcareApplication` in the logs when it's ready.
 
-**Step 3 — Open Swagger UI**
+**Step 3 — Open the app**
+This automatically starts:
+- The React Client on `http://localhost:5173`
+
+**Step 4 — Open Swagger UI**
 
 Go to: **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
 
@@ -153,7 +158,7 @@ CREATE DATABASE healthcare_system;
 
 **Step 3 — Configure the application**
 
-Open `src/main/resources/application.properties` and update these lines:
+Open `backend/src/main/resources/application.properties` and update these lines:
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/healthcare_system
 spring.datasource.username=YOUR_MYSQL_USERNAME
@@ -162,12 +167,23 @@ spring.datasource.password=YOUR_MYSQL_PASSWORD
 
 **Step 4 — Run the application**
 ```bash
+cd backend
 ./mvnw spring-boot:run
 ```
 
 Wait for `Started HealthcareApplication` in the console.
 
-**Step 5 — Open Swagger UI**
+**Step 5 — Start the frontend**
+
+Open a new terminal and run:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open **http://localhost:5173** in your browser.
+
+**Step 6 — Open Swagger UI**
 
 Go to: **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
 
@@ -186,7 +202,7 @@ In Swagger UI:
 4. Paste this into the request body:
 ```json
 {
-  "name": "Test@123",
+  "fullName": "Test User",
   "email": "testuser@example.com",
   "password": "Password@123",
   "role": "ROLE_PATIENT"
@@ -279,16 +295,24 @@ Access tokens are **short-lived** (15 minutes by default). Refresh tokens are **
 
 ## Frontend UI
 
-A lightweight React.js frontend is currently in development to visually demonstrate the API capabilities.
+A lightweight React.js frontend is included and runs automatically with Docker.
 
-**Planned screens:**
-- Registration & Login page
-- Patient dashboard — view profile, appointments, medical records
-- Doctor dashboard — manage availability and slots
-- Admin panel — manage hospitals, doctors, specializations
-- Appointment booking flow with payment
+**Screens:**
+- Landing page — system overview and feature highlights
+- Login & Register — with role selection
+- Patient Dashboard — view profile, appointments, medical records, doctors
+- Doctor Dashboard — manage availability, view appointments
+- Admin Panel — manage hospitals, doctors, specializations, patients
 
-**Until then**, the Swagger UI at `/swagger-ui/index.html` provides a fully interactive interface to test every single API endpoint with real request/response data — which is actually more useful for API evaluation than a basic frontend.
+Open **[http://localhost:3000](http://localhost:3000)** after running `docker compose up --build`.
+
+**Demo credentials (password for all: `Password@123`)**
+
+| Role | Email |
+|---|---|
+| Hospital Admin | admin@healthcare.com |
+| Doctor | arjun@healthcare.com |
+| Patient | rahul@healthcare.com |
 
 ---
 
@@ -323,7 +347,8 @@ This project is built with production scalability in mind, not just as a demo:
 
 **Stateless Authentication** — JWT means any number of server instances can validate tokens without shared session state. Horizontal scaling works out of the box.
 
-**Redis Caching** — Read-heavy endpoints (doctor listings, hospital listings, specializations) are cached in Redis, reducing database load significantly as traffic grows.
+**Spring Cache** — Read-heavy endpoints (doctor listings, hospital listings, specializations) 
+are cached using Spring's built-in cache, reducing database load significantly as traffic grows.
 
 **Idempotency Keys** — The appointment booking endpoint requires an `X-Idempotency-Key` header. This prevents duplicate bookings if a client retries a failed request — a critical pattern for payment and booking systems at scale.
 
@@ -331,25 +356,35 @@ This project is built with production scalability in mind, not just as a demo:
 
 **Modular Structure** — Every feature is a self-contained module (controller → service → repository). Adding a new feature doesn't touch existing code. This structure maps directly to a microservices split if the system needs to scale further.
 
-**Docker Ready** — The entire stack (API + MySQL + Redis) runs in containers, making deployment to any cloud provider (AWS, GCP, Azure) straightforward.
+**Docker Ready** — The entire stack (API + MySQL) runs in containers, making deployment 
+to any cloud provider (AWS, GCP, Azure) straightforward.
 
 ---
 
 ## Project Structure
-
 ```
-src/main/java/com/healthcare/
-├── controller/       # API endpoints (one file per module)
-├── service/          # Business logic
-├── repository/       # Database queries
-├── dto/
-│   ├── request/      # Incoming request bodies
-│   └── response/     # Outgoing response shapes
-├── model/            # Database entities
-├── security/         # JWT, UserDetails, filters
-├── exception/        # Global error handling
-├── config/           # Spring configuration
-└── swagger/          # API documentation annotations
+multi-tenant-healthcare-backend/
+├── backend/                        # Spring Boot application
+│   ├── src/main/java/com/healthcare/
+│   │   ├── controller/             # API endpoints
+│   │   ├── service/                # Business logic
+│   │   ├── repository/             # Database queries
+│   │   ├── dto/                    # Request & response shapes
+│   │   ├── model/                  # Database entities
+│   │   ├── security/               # JWT, filters
+│   │   ├── exception/              # Global error handling
+│   │   ├── config/                 # Spring configuration
+│   │   └── swagger/                # API documentation
+│   └── src/main/resources/
+│       └── application.properties
+├── frontend/                       # React.js application
+│   ├── src/
+│   │   ├── pages/                  # Landing, Auth, Dashboard
+│   │   ├── components/             # Sidebar, Toast, Forms
+│   │   └── api/                    # API client
+│   └── package.json
+├── docker-compose.yml              # Orchestrates full stack
+└── README.md
 ```
 
 ---
@@ -366,7 +401,6 @@ If running with Docker, these are pre-configured in `docker-compose.yml`. For lo
 | `JWT_SECRET` | Secret key for signing JWT tokens | — |
 | `JWT_EXPIRY_MS` | Access token expiry in milliseconds | `900000` (15 min) |
 | `REFRESH_TOKEN_EXPIRY_DAYS` | Refresh token expiry | `7` |
-| `REDIS_HOST` | Redis host | `localhost` |
 
 ---
 
