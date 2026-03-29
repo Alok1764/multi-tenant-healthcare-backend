@@ -95,6 +95,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Cacheable(value = "patient-appointments", key = "#patientId")
     public List<AppointmentResponse> getPatientAppointments(Long patientId) {
+
+        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+        if (appointments == null || appointments.isEmpty()) {
+            return List.of();
+        }
         return appointmentRepository.findByPatientId(patientId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -103,7 +108,13 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Cacheable(value = "doctor-appointments", key = "#doctorId")
     public List<AppointmentResponse> getDoctorAppointments(Long doctorId) {
-        return appointmentRepository.findByDoctorId(doctorId).stream()
+
+        List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
+        if (appointments == null || appointments.isEmpty()) {
+            return List.of();
+        }
+
+            return appointmentRepository.findByDoctorId(doctorId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

@@ -185,7 +185,7 @@ function LandingPage({ onLogin }) {
           "Spring Boot 3",
           "JWT Auth",
           "MySQL 8",
-          "Redis Cache",
+          "Cache",
           "Docker",
           "Swagger UI",
         ].map((t) => (

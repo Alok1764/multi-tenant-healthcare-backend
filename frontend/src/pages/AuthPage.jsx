@@ -195,24 +195,25 @@ function AuthPage({ onAuth, toastShow }) {
                     color: "var(--white)",
                   }}
                 >
-                  Demo credentials
+                  Demo credentials (password for all: Password@123)
                 </div>
                 <div>
                   Admin:{" "}
                   <span style={{ color: "var(--teal)" }}>
                     admin@healthcare.com
-                  </span>{" "}
-                  / Admin@123
+                  </span>
                 </div>
                 <div>
                   Doctor:{" "}
-                  <span style={{ color: "var(--teal)" }}>doctor@test.com</span>{" "}
-                  / Password@123
+                  <span style={{ color: "var(--teal)" }}>
+                    arjun@healthcare.com
+                  </span>
                 </div>
                 <div>
                   Patient:{" "}
-                  <span style={{ color: "var(--teal)" }}>patient@test.com</span>{" "}
-                  / Password@123
+                  <span style={{ color: "var(--teal)" }}>
+                    rahul@healthcare.com
+                  </span>
                 </div>
               </div>
             </>

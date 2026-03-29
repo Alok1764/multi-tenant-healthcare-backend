@@ -52,7 +52,7 @@ public class DoctorController {
 
     @SetAvailabilityDoc
     @PostMapping("/availability")
-    @PreAuthorize("hasAuthority('DOCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_DOCTOR')")
     public ResponseEntity<Void> setAvailability(
             @RequestBody @Valid AvailabilityRequest request
     ) {

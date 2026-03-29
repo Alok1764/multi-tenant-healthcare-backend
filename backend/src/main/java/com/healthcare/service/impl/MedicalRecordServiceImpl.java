@@ -84,6 +84,13 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Cacheable(value = "patient-medical-records", key = "#patientId")
     public List<MedicalRecordResponse> getPatientMedicalRecords(Long patientId) {
+
+        List<MedicalRecord> records = medicalRecordRepository.findByPatientId(patientId);
+
+        if (records == null || records.isEmpty()) {
+            return List.of();
+        }
+
         return medicalRecordRepository.findByPatientId(patientId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

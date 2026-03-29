@@ -29,7 +29,7 @@ public class PaymentController {
 
     @GetPaymentStatusDoc
     @GetMapping("/appointment/{appointmentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT', 'ROLE_HOSPITAL_ADMIN')")
     public ResponseEntity<PaymentResponse> getPaymentStatus(@PathVariable Long appointmentId) {
         return ResponseEntity.ok(paymentService.getPaymentByAppointmentId(appointmentId));
     }

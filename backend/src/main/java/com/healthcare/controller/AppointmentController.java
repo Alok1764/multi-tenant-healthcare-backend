@@ -50,21 +50,21 @@ public class AppointmentController {
 
     @GetPatientAppointmentsDoc
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAuthority('PATIENT') or hasAuthority('DOCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT') or hasAuthority('ROLE_DOCTOR')")
     public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(@PathVariable Long patientId) {
         return ResponseEntity.ok(appointmentService.getPatientAppointments(patientId));
     }
 
     @GetDoctorAppointmentsDoc
     @GetMapping("/doctor/{doctorId}")
-    @PreAuthorize("hasAuthority('DOCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_DOCTOR')")
     public ResponseEntity<List<AppointmentResponse>> getDoctorAppointments(@PathVariable Long doctorId) {
         return ResponseEntity.ok(appointmentService.getDoctorAppointments(doctorId));
     }
 
     @CancelAppointmentDoc
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasAuthority('PATIENT') or hasAuthority('DOCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT') or hasAuthority('ROLE_DOCTOR')")
     public ResponseEntity<Void> cancelAppointment(@PathVariable Long id) {
         appointmentService.cancelAppointment(id);
         return ResponseEntity.noContent().build();
