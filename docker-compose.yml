@@ -23,6 +23,7 @@ services:
     container_name: healthcare-app
     ports:
       - "8080:8080"
+    restart: on-failure
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/healthcare_system?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
@@ -37,7 +38,9 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: healthcare-frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://app:8080
     depends_on:
       - app
 
