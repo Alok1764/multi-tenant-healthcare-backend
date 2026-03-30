@@ -43,7 +43,7 @@ This is a **production-grade REST API** for a multi-tenant hospital management s
 | API Documentation | Done | Interactive Swagger UI — test every endpoint in the browser |
 | Database Schema | Done | MySQL with normalized relational schema |
 | Security | Done | BCrypt hashing, JWT, idempotency keys, stateless auth |
-| Caching (Optional) | Done | Redis caching on read-heavy endpoints |
+| Caching (Optional) | Done | Inmemory caching on read-heavy endpoints |
 | Docker (Optional) | Done | Full Docker + Docker Compose setup |
 | Frontend UI | Done | React.js frontend (see [Frontend UI](#frontend-ui)) |
 
@@ -83,7 +83,7 @@ Patient         →  Books appointments, views medical history, processes paymen
 | Framework | Spring Boot 3.2.1 |
 | Database | MySQL 8 |
 | Authentication | JWT (Access + Refresh Tokens) |
-| Caching | Internal cache |
+| Caching | Inmemory cache |
 | API Docs | Swagger / OpenAPI 3 |
 | Build Tool | Maven |
 | Containerization | Docker + Docker Compose |
