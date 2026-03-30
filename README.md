@@ -304,7 +304,7 @@ A lightweight React.js frontend is included and runs automatically with Docker.
 - Doctor Dashboard — manage availability, view appointments
 - Admin Panel — manage hospitals, doctors, specializations, patients
 
-Open **[http://localhost:3000](http://localhost:3000)** after running `docker compose up --build`.
+Open **[http://localhost:5173](http://localhost:5173)** after running `docker compose up --build`.
 
 **Demo credentials (password for all: `Password@123`)**
 
